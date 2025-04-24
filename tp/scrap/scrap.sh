@@ -17,6 +17,19 @@ INSERT INTO data (url, title, description) values ('$1', '$2', '$3');
 EOF
 }
 
+# Le fait de concaténer les arguments à la requête sql permet des injections sql
+# Typiquement si $1=toto, $2=toto et $3 = "toto'); DROP TABLE data;" 
+# La requête sql devient
+# INSERT INTO data (url, title, description) values ('toto', 'toto', 'toto'); DROP TABLE data;');
+
+# Pour éviter cela il faut utiliser des requêtes préparées
+# "INSERT INTO data (url, title, description) values (?, ?, ?);" "$1" "$2" "$3"
+
+# Ansi, si $3 = "toto'); DROP TABLE data;"
+# La requête sql devient
+# INSERT INTO data (url, title, description) values ('toto', 'toto', 'toto'); DROP TABLE data;');
+
+
 function scrap() {
 	#recupère la page
 	pages_content=$(curl -s "$1")
